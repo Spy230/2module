@@ -23,27 +23,24 @@ public class MainActivity extends AppCompatActivity {
         monthCountTextView = findViewById(R.id.countOut);
         monthlyPaymentDetailsTextView = findViewById(R.id.mayMounthOut);
 
-        monthCountTextView.setText(calculateMonths(bankInterestRate, monthlyStipend, percentFree, robotCost, initialAmount, monthlyPaymentList) + " months");
-        String monthlyPaymentsList = "";
-        for (float list : monthlyPaymentList) {
-            if (list > 0) {
-                monthlyPaymentsList += Float.toString(list) + ", ";
-            } else {
-                break;
-            }
-        }
-        monthlyPaymentDetailsTextView.setText("первоначальный взнос" + initialAmount + "монет, ежемесячные выплаты ( монет): " + monthlyPaymentsList);
-    }
+        int months = calculateMonths(bankInterestRate, monthlyStipend, percentFree, robotCost, initialAmount, monthlyPaymentList);
+        monthCountTextView.setText(months + " months");
 
+        String monthlyPaymentsList = "";
+        for (int i = 0; i < months; i++) {
+            monthlyPaymentsList += Float.toString(monthlyPaymentList[i]) + ", ";
+        }
+        monthlyPaymentDetailsTextView.setText("первоначальный взнос: " + initialAmount + " монет, ежемесячные выплаты (монет): " + monthlyPaymentsList);
+    }
 
     public int calculateMonths(float bankInterestRateYear, float monthlyStipend, int percentFree, float robotCost, int initialAmount, float[] monthlyPaymentArray) {
         float bankInterestRateMonth = bankInterestRateYear / 12;
-        float mortgageCosts = (initialAmount * monthlyStipend) / 100;
         float total = robotCost - initialAmount;
         int monthCount = 0;
         while (total > 0) {
             monthCount++;
-            total = (total + (total * bankInterestRateMonth / 100) - mortgageCosts);
+            float mortgageCosts = (total * monthlyStipend) / 100;
+            total = (total -  monthlyStipend) + (total * bankInterestRateMonth / 100);
             if (total > 0) {
                 monthlyPaymentArray[monthCount - 1] = Math.min(mortgageCosts, total);
             }
