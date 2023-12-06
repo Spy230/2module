@@ -7,12 +7,12 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    float robotCost = 35_000; //стоимость робота
-    float monthlyStipend = 1_700; //стипендия
+    float robotCost = 35000; //стоимость робота
+    float monthlyStipend = 1700; //стипендия
     int initialAmount = 700; //на счету
     int percentFree = 100; //сколько можно отложить
     float bankInterestRate = 9; //банк под 9%
-    float[] monthlyPaymentList = new float[60];
+    float[] monthlyPaymentList = new float[90];
     private TextView monthCountTextView;
     private TextView monthlyPaymentDetailsTextView;
 
@@ -34,17 +34,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public int calculateMonths(float bankInterestRateYear, float monthlyStipend, int percentFree, float robotCost, int initialAmount, float[] monthlyPaymentArray) {
-        float bankInterestRateMonth = bankInterestRateYear / 12;
-        float total = robotCost - initialAmount;
-        int monthCount = 0;
-        while (total > 0) {
-            monthCount++;
-            float mortgageCosts = (total * monthlyStipend) / 100;
-            total = (total -  monthlyStipend) + (total * bankInterestRateMonth / 100);
-            if (total > 0) {
-                monthlyPaymentArray[monthCount - 1] = Math.min(mortgageCosts, total);
-            }
+        float interestRateMonth = bankInterestRateYear / 12; // подсчет ежемесячной процентной ставки по накоплениям
+        float percentFreeFloat = initialAmount;
+        int count = 0; // счетчик месяцев накоплений
+
+        // алгоритм расчета накоплений
+        while (percentFreeFloat < robotCost) {
+            count++;
+            percentFreeFloat += monthlyStipend;
+            monthlyPaymentArray[count - 1] = percentFreeFloat;
+            percentFreeFloat *= (1 + interestRateMonth / 100);
         }
-        return monthCount;
+
+        return count;
     }
 }
